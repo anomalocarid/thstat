@@ -11,37 +11,11 @@ pub struct MainAppUi {
 
 impl nwg::NativeUi<MainAppUi> for MainApp {
     fn build_ui(mut data: MainApp) -> Result<MainAppUi, nwg::NwgError> {
-        // Main window
-        nwg::Window::builder()
-            .flags(
-                nwg::WindowFlags::WINDOW
-                    | nwg::WindowFlags::VISIBLE
-                    | nwg::WindowFlags::MINIMIZE_BOX,
-            )
-            .title("thstat")
-            .size((200, 300))
-            .build(&mut data.main_window)?;
+        // Windows
+        builders::build_main_window(&mut data)?;
+        builders::build_process_window(&data.main_window, &mut data.process_window)?;
         // Main menu
-        nwg::Menu::builder()
-            .text("&File")
-            .disabled(false)
-            .parent(&data.main_window)
-            .build(&mut data.file_menu)?;
-        nwg::MenuItem::builder()
-            .text("E&xit")
-            .disabled(false)
-            .parent(&data.file_menu)
-            .build(&mut data.file_exit_menu)?;
-        nwg::Menu::builder()
-            .text("&Help")
-            .disabled(false)
-            .parent(&data.main_window)
-            .build(&mut data.help_menu)?;
-        nwg::MenuItem::builder()
-            .text("&About")
-            .disabled(false)
-            .parent(&data.help_menu)
-            .build(&mut data.help_about_menu)?;
+        builders::build_menu(&mut data)?;
 
         // Make UI struct
         let ui = MainAppUi {
@@ -59,10 +33,12 @@ impl nwg::NativeUi<MainAppUi> for MainApp {
                         }
                     }
                     nwg::Event::OnMenuItemSelected => {
-                        if &handle == &ui.file_exit_menu {
+                        if &handle == &ui.menu.file_exit {
                             MainApp::on_close(&ui);
-                        } else if &handle == &ui.help_about_menu {
+                        } else if &handle == &ui.menu.help_about {
                             MainApp::on_help_about(&ui);
+                        } else if &handle == &ui.menu.view_process {
+                            MainApp::on_view_process(&ui);
                         }
                     }
                     _ => {}
