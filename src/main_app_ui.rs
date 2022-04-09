@@ -41,6 +41,11 @@ impl nwg::NativeUi<MainAppUi> for MainApp {
                             MainApp::on_view_process(&ui);
                         }
                     }
+                    nwg::Event::OnButtonClick => {
+                        if &handle == &ui.scan_button {
+                            MainApp::on_scan(&ui);
+                        }
+                    }
                     _ => {}
                 }
             }
