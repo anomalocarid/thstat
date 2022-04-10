@@ -1,3 +1,6 @@
+use crate::game::PROCESS_NAMES;
+use crate::process::{get_process_list, ProcessInfo};
+
 #[derive(Default)]
 pub struct MainAppMenu {
     pub file: nwg::Menu,
@@ -35,43 +38,20 @@ impl MainApp {
     }
 
     pub fn on_scan(&self) {
-        use std::mem::size_of;
-        use winapi::shared::minwindef::{DWORD, TRUE};
-        use winapi::um::handleapi::{CloseHandle, INVALID_HANDLE_VALUE};
-        use winapi::um::tlhelp32::{
-            CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
-            TH32CS_SNAPPROCESS,
-        };
-
-        let handle = unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
-        if handle == INVALID_HANDLE_VALUE {
-            return;
-        }
-
-        let mut pe32: PROCESSENTRY32W = Default::default();
-        pe32.dwSize = size_of::<PROCESSENTRY32W>() as DWORD;
-        let mut b = unsafe { Process32FirstW(handle, &mut pe32) };
-        if b != TRUE {
-            unsafe { CloseHandle(handle) };
-            return;
-        }
-
-        loop {
-            let result = String::from_utf16(&pe32.szExeFile);
-            match result {
-                Ok(s) => {
-                    self.process_list.push(s);
-                }
-                Err(_e) => {}
+        let mut list: Vec<ProcessInfo> = Vec::new();
+        let result = get_process_list(&mut list);
+        match result {
+            Ok(()) => {
+                self.process_list.clear();
+                list.iter()
+                    .filter(|p| PROCESS_NAMES.iter().any(|&s| s.eq(&p.name)))
+                    .for_each(|p| self.process_list.push(p.name.clone()));
             }
-
-            b = unsafe { Process32NextW(handle, &mut pe32) };
-            if b != TRUE {
-                break;
+            Err(e) => {
+                let s = format!("{}", e);
+                nwg::modal_error_message(&self.main_window, "Error", &s);
             }
         }
-
-        unsafe { CloseHandle(handle) };
     }
 
     pub fn on_view_process(&self) {

@@ -7,9 +7,11 @@ use nwg::NativeUi;
 mod main_app;
 use main_app::MainApp;
 mod builders;
+mod game;
 mod main_app_ui;
+mod process;
 
-fn main() {
+fn main() -> windows::core::Result<()> {
     nwg::init().expect("Failed to initialize.");
 
     let app = MainApp::build_ui(Default::default());
@@ -22,4 +24,6 @@ fn main() {
             nwg::modal_error_message(nwg::ControlHandle::NoHandle, "Error", &s);
         }
     }
+
+    Ok(())
 }
