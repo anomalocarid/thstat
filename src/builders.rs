@@ -1,4 +1,5 @@
-use crate::main_app::{MainApp, ProcessWindow};
+use crate::main_app::{GameInfoWindow, MainApp, ProcessWindow};
+use std::time::Duration;
 
 /// Build the main window
 pub fn build_main_window(window: &mut MainApp) -> Result<(), nwg::NwgError> {
@@ -21,6 +22,12 @@ pub fn build_main_window(window: &mut MainApp) -> Result<(), nwg::NwgError> {
         .flags(nwg::ListBoxFlags::VISIBLE | nwg::ListBoxFlags::TAB_STOP)
         .parent(&window.main_window)
         .build(&mut window.process_list)?;
+    nwg::AnimationTimer::builder()
+        .parent(&window.main_window)
+        .interval(Duration::from_millis(100))
+        .lifetime(None)
+        .max_tick(None)
+        .build(&mut window.update_timer)?;
     nwg::GridLayout::builder()
         .parent(&window.main_window)
         .max_column(Some(2))
@@ -70,6 +77,34 @@ pub fn build_process_window(
         .child(1, 0, &window.name_value)
         .child(0, 1, &window.id_label)
         .child(1, 1, &window.id_value)
+        .build(&mut window.layout)
+}
+
+/// Build the window for the game information
+pub fn build_game_info_window(
+    parent: &nwg::Window,
+    window: &mut GameInfoWindow,
+) -> Result<(), nwg::NwgError> {
+    nwg::Window::builder()
+        .parent(Some(parent))
+        .flags(nwg::WindowFlags::WINDOW)
+        .title("Game Info")
+        .size((500, 200))
+        .build(&mut window.handle)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
+        .text("Score: ")
+        .build(&mut window.score_label)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
+        .text("0")
+        .build(&mut window.score_value)?;
+    nwg::GridLayout::builder()
+        .parent(&window.handle)
+        .max_column(Some(2))
+        .max_row(Some(1))
+        .child(0, 0, &window.score_label)
+        .child(1, 0, &window.score_value)
         .build(&mut window.layout)
 }
 

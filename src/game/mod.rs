@@ -1,4 +1,8 @@
-/// Definitions specific to Touhou games
+// Definitions specific to Touhou games
+use crate::process::Handle;
+use std::rc::Rc;
+pub mod th10;
+
 pub static PROCESS_NAMES: [&str; 13] = [
     "東方紅魔郷.exe",
     "th07.exe",
@@ -14,3 +18,11 @@ pub static PROCESS_NAMES: [&str; 13] = [
     "th17.exe",
     "th18.exe",
 ];
+
+pub trait ThGame {
+    fn get_score(&self) -> Option<u64>;
+}
+
+pub struct GameBase {
+    handle: Rc<Handle>,
+}

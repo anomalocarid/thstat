@@ -1,4 +1,5 @@
-use crate::game::PROCESS_NAMES;
+use crate::game::th10::Th10Game;
+use crate::game::{ThGame, PROCESS_NAMES};
 use crate::process::{get_process_list, open_process, Process, ProcessInfo};
 
 #[derive(Default)]
@@ -22,15 +23,26 @@ pub struct ProcessWindow {
 }
 
 #[derive(Default)]
+pub struct GameInfoWindow {
+    pub handle: nwg::Window,
+    pub layout: nwg::GridLayout,
+    pub score_label: nwg::Label,
+    pub score_value: nwg::Label,
+}
+
+#[derive(Default)]
 pub struct MainApp {
     pub main_window: nwg::Window,
+    pub update_timer: nwg::AnimationTimer,
     pub layout: nwg::GridLayout,
     pub scan_button: nwg::Button,
     pub hook_button: nwg::Button,
     pub process_list: nwg::ListBox<ProcessInfo>,
     pub menu: MainAppMenu,
     pub process_window: ProcessWindow,
+    pub game_info_window: GameInfoWindow,
     pub process: Process,
+    pub game: Option<Box<dyn ThGame>>,
 }
 
 impl MainApp {
@@ -65,6 +77,7 @@ impl MainApp {
                 let collection = self.process_list.collection();
                 let result = open_process(&collection[i]);
                 match result {
+                    // Successfully gained a handle to the process with desired access
                     Ok(process) => {
                         self.process = process;
                         self.process_window
@@ -73,6 +86,21 @@ impl MainApp {
                         self.process_window
                             .name_value
                             .set_text(&self.process.info.name);
+                        // Check that the process is a valid game (very simple check for now)
+                        match self.process.info.name.as_str() {
+                            "th10.exe" => {
+                                self.game_info_window.handle.set_visible(true);
+                                self.game =
+                                    Some(Box::new(Th10Game::new(self.process.handle.clone())));
+                                self.update_timer.start();
+                            }
+                            _ => {
+                                self.game = None;
+                                self.game_info_window.handle.set_visible(false);
+                                let s = format!("Unsupported game: {}", self.process.info.name);
+                                nwg::modal_error_message(&self.main_window, "Error", &s);
+                            }
+                        }
                     }
                     Err(e) => {
                         let s = format!("{}", e);
@@ -83,6 +111,19 @@ impl MainApp {
             None => {
                 nwg::modal_info_message(&self.main_window, "Error", "No process is selected.");
             }
+        }
+    }
+
+    pub fn on_game_update(&self) {
+        match &self.game {
+            Some(game) => {
+                if let Some(score) = game.get_score() {
+                    self.game_info_window
+                        .score_value
+                        .set_text(&format!("{}", score));
+                }
+            }
+            None => {}
         }
     }
 

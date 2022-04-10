@@ -1,5 +1,6 @@
-/// Code to deal with listing, opening, and reading processes in Windows for thstat
+// Code to deal with listing, opening, and reading processes in Windows for thstat
 use std::mem::size_of;
+use std::rc::Rc;
 use windows::{
     core::Error,
     Win32::{
@@ -16,7 +17,7 @@ use windows::{
 
 /// Wrapper for handles that need to be closed
 #[derive(Default)]
-pub struct Handle(HANDLE);
+pub struct Handle(pub HANDLE);
 impl Drop for Handle {
     fn drop(&mut self) {
         if !self.0.is_invalid() {
@@ -33,7 +34,7 @@ pub struct ProcessInfo {
 
 #[derive(Default)]
 pub struct Process {
-    pub handle: Handle,
+    pub handle: Rc<Handle>,
     pub info: ProcessInfo,
 }
 
@@ -76,7 +77,7 @@ pub fn open_process(p: &ProcessInfo) -> Result<Process, Error> {
     let handle =
         unsafe { OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, BOOL(0), p.pid) }?;
     Ok(Process {
-        handle: Handle(handle),
+        handle: Rc::new(Handle(handle)),
         info: p.clone(),
     })
 }
