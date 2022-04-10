@@ -1,0 +1,1 @@
+thstat will be a program that allows a player to track their statistics while playing the Touhou Project games. It works by reading information from the game while it is running.
