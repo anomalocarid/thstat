@@ -1,13 +1,13 @@
 // Structures and definitions for Touhou 10
 use core::ffi::c_void;
-use windows::Win32::System::Diagnostics::Debug::ReadProcessMemory;
 
+const HISCORE_ADDR: u32 = 0x474c40;
 const CURRENT_SCORE_ADDR: u32 = 0x474c44;
 const CURRENT_POWER_ADDR: u32 = 0x474c48;
 const CURRENT_LIVES_ADDR: u32 = 0x474C70;
 
 use super::{GameBase, ThGame};
-use crate::process::Handle;
+use crate::process::ProcessHandle;
 use std::rc::Rc;
 
 pub struct Th10Game {
@@ -15,7 +15,7 @@ pub struct Th10Game {
 }
 
 impl Th10Game {
-    pub fn new(handle: Rc<Handle>) -> Self {
+    pub fn new(handle: Rc<ProcessHandle>) -> Self {
         Th10Game {
             base: GameBase { handle: handle },
         }
@@ -23,22 +23,30 @@ impl Th10Game {
 }
 
 impl ThGame for Th10Game {
-    fn get_score(&self) -> Option<u64> {
-        let mut score: u32 = 0;
-        let mut amt_read: usize = 0;
-        let b = unsafe {
-            ReadProcessMemory(
-                self.base.handle.0,
-                CURRENT_SCORE_ADDR as *const c_void,
-                &mut score as *mut u32 as *mut c_void,
-                4,
-                &mut amt_read,
-            )
-        };
+    fn get_hiscore(&self) -> Option<u64> {
+        let hiscore = self.base.handle.read_u32(HISCORE_ADDR as *const c_void);
+        hiscore.map(|x| (x as u64) * 10)
+    }
 
-        if !b.as_bool() || amt_read != 4 {
-            return None;
-        }
-        Some((score as u64) * 10)
+    fn get_score(&self) -> Option<u64> {
+        let score = self
+            .base
+            .handle
+            .read_u32(CURRENT_SCORE_ADDR as *const c_void);
+        score.map(|x| (x as u64) * 10)
+    }
+
+    fn get_power(&self) -> Option<f32> {
+        let power = self
+            .base
+            .handle
+            .read_u16(CURRENT_POWER_ADDR as *const c_void);
+        power.map(|x| (x as f32) * 5.0 / 100.0)
+    }
+
+    fn get_lives(&self) -> Option<u32> {
+        self.base
+            .handle
+            .read_u32(CURRENT_LIVES_ADDR as *const c_void)
     }
 }

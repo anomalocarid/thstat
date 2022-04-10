@@ -1,5 +1,5 @@
 // Definitions specific to Touhou games
-use crate::process::Handle;
+use crate::process::ProcessHandle;
 use std::rc::Rc;
 pub mod th10;
 
@@ -20,9 +20,12 @@ pub static PROCESS_NAMES: [&str; 13] = [
 ];
 
 pub trait ThGame {
+    fn get_hiscore(&self) -> Option<u64>;
     fn get_score(&self) -> Option<u64>;
+    fn get_power(&self) -> Option<f32>;
+    fn get_lives(&self) -> Option<u32>;
 }
 
 pub struct GameBase {
-    handle: Rc<Handle>,
+    handle: Rc<ProcessHandle>,
 }

@@ -1,4 +1,5 @@
 // Code to deal with listing, opening, and reading processes in Windows for thstat
+use core::ffi::c_void;
 use std::mem::size_of;
 use std::rc::Rc;
 use windows::{
@@ -6,19 +7,65 @@ use windows::{
     Win32::{
         Foundation::{CloseHandle, BOOL, HANDLE},
         System::{
-            Diagnostics::ToolHelp::{
-                CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
-                TH32CS_SNAPPROCESS,
+            Diagnostics::{
+                Debug::ReadProcessMemory,
+                ToolHelp::{
+                    CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
+                    TH32CS_SNAPPROCESS,
+                },
             },
             Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ},
         },
     },
 };
 
-/// Wrapper for handles that need to be closed
+/// Wrapper for handles to a process
 #[derive(Default)]
-pub struct Handle(pub HANDLE);
-impl Drop for Handle {
+pub struct ProcessHandle(pub HANDLE);
+
+impl ProcessHandle {
+    pub fn read_u32(&self, addr: *const c_void) -> Option<u32> {
+        let mut dword: u32 = 0;
+        let mut amt_read: usize = 0;
+        let b = unsafe {
+            ReadProcessMemory(
+                self.0,
+                addr,
+                &mut dword as *mut u32 as *mut c_void,
+                4,
+                &mut amt_read,
+            )
+        };
+
+        if !b.as_bool() || amt_read != 4 {
+            return None;
+        }
+
+        Some(dword)
+    }
+
+    pub fn read_u16(&self, addr: *const c_void) -> Option<u32> {
+        let mut word: u32 = 0;
+        let mut amt_read: usize = 0;
+        let b = unsafe {
+            ReadProcessMemory(
+                self.0,
+                addr,
+                &mut word as *mut u32 as *mut c_void,
+                2,
+                &mut amt_read,
+            )
+        };
+
+        if !b.as_bool() || amt_read != 2 {
+            return None;
+        }
+
+        Some(word)
+    }
+}
+
+impl Drop for ProcessHandle {
     fn drop(&mut self) {
         if !self.0.is_invalid() {
             unsafe { CloseHandle(self.0) };
@@ -34,7 +81,7 @@ pub struct ProcessInfo {
 
 #[derive(Default)]
 pub struct Process {
-    pub handle: Rc<Handle>,
+    pub handle: Rc<ProcessHandle>,
     pub info: ProcessInfo,
 }
 
@@ -45,7 +92,7 @@ impl std::fmt::Display for ProcessInfo {
 }
 
 pub fn get_process_list(list: &mut Vec<ProcessInfo>) -> Result<(), Error> {
-    let handle = Handle(unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)? });
+    let handle = ProcessHandle(unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)? });
     let mut pe32: PROCESSENTRY32W = Default::default();
     pe32.dwSize = size_of::<PROCESSENTRY32W>() as u32;
     let mut b = unsafe { Process32FirstW(handle.0, &mut pe32) }.as_bool();
@@ -77,7 +124,7 @@ pub fn open_process(p: &ProcessInfo) -> Result<Process, Error> {
     let handle =
         unsafe { OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, BOOL(0), p.pid) }?;
     Ok(Process {
-        handle: Rc::new(Handle(handle)),
+        handle: Rc::new(ProcessHandle(handle)),
         info: p.clone(),
     })
 }

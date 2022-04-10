@@ -26,8 +26,14 @@ pub struct ProcessWindow {
 pub struct GameInfoWindow {
     pub handle: nwg::Window,
     pub layout: nwg::GridLayout,
+    pub hiscore_label: nwg::Label,
+    pub hiscore_value: nwg::Label,
     pub score_label: nwg::Label,
     pub score_value: nwg::Label,
+    pub power_label: nwg::Label,
+    pub power_value: nwg::Label,
+    pub lives_label: nwg::Label,
+    pub lives_value: nwg::Label,
 }
 
 #[derive(Default)]
@@ -117,10 +123,25 @@ impl MainApp {
     pub fn on_game_update(&self) {
         match &self.game {
             Some(game) => {
+                if let Some(hiscore) = game.get_hiscore() {
+                    self.game_info_window
+                        .hiscore_value
+                        .set_text(&format!("{}", hiscore))
+                }
                 if let Some(score) = game.get_score() {
                     self.game_info_window
                         .score_value
                         .set_text(&format!("{}", score));
+                }
+                if let Some(power) = game.get_power() {
+                    self.game_info_window
+                        .power_value
+                        .set_text(&format!("{:.2}", power));
+                }
+                if let Some(lives) = game.get_lives() {
+                    self.game_info_window
+                        .lives_value
+                        .set_text(&format!("{}", lives));
                 }
             }
             None => {}

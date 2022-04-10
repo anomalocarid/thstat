@@ -1,3 +1,4 @@
+// All the boilerplate code to generate windows and controls goes in this file
 use crate::main_app::{GameInfoWindow, MainApp, ProcessWindow};
 use std::time::Duration;
 
@@ -89,22 +90,60 @@ pub fn build_game_info_window(
         .parent(Some(parent))
         .flags(nwg::WindowFlags::WINDOW)
         .title("Game Info")
-        .size((500, 200))
+        .size((300, 200))
         .build(&mut window.handle)?;
     nwg::Label::builder()
         .parent(&window.handle)
+        .text("Hi-Score: ")
+        .h_align(nwg::HTextAlign::Right)
+        .build(&mut window.hiscore_label)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
+        .text("0")
+        .h_align(nwg::HTextAlign::Right)
+        .build(&mut window.hiscore_value)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
         .text("Score: ")
+        .h_align(nwg::HTextAlign::Right)
         .build(&mut window.score_label)?;
     nwg::Label::builder()
         .parent(&window.handle)
         .text("0")
+        .h_align(nwg::HTextAlign::Right)
         .build(&mut window.score_value)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
+        .text("Power: ")
+        .h_align(nwg::HTextAlign::Right)
+        .build(&mut window.power_label)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
+        .text("0.00")
+        .h_align(nwg::HTextAlign::Right)
+        .build(&mut window.power_value)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
+        .text("Lives: ")
+        .h_align(nwg::HTextAlign::Right)
+        .build(&mut window.lives_label)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
+        .text("0")
+        .h_align(nwg::HTextAlign::Right)
+        .build(&mut window.lives_value)?;
     nwg::GridLayout::builder()
         .parent(&window.handle)
         .max_column(Some(2))
-        .max_row(Some(1))
-        .child(0, 0, &window.score_label)
-        .child(1, 0, &window.score_value)
+        .max_row(Some(4))
+        .child(0, 0, &window.hiscore_label)
+        .child(1, 0, &window.hiscore_value)
+        .child(0, 1, &window.score_label)
+        .child(1, 1, &window.score_value)
+        .child(0, 2, &window.power_label)
+        .child(1, 2, &window.power_value)
+        .child(0, 3, &window.lives_label)
+        .child(1, 3, &window.lives_value)
         .build(&mut window.layout)
 }
 
