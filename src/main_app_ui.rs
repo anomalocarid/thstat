@@ -5,7 +5,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 pub struct MainAppUi {
-    inner: Rc<MainApp>,
+    // RefCell needed to be able to mutate the MainApp during events
+    inner: Rc<RefCell<MainApp>>,
     default_handler: RefCell<Option<nwg::EventHandler>>,
 }
 
@@ -19,7 +20,7 @@ impl nwg::NativeUi<MainAppUi> for MainApp {
 
         // Make UI struct
         let ui = MainAppUi {
-            inner: Rc::new(data),
+            inner: Rc::new(RefCell::new(data)),
             default_handler: Default::default(),
         };
         // Event handlers
@@ -28,11 +29,13 @@ impl nwg::NativeUi<MainAppUi> for MainApp {
             if let Some(ui) = evt_ui.upgrade() {
                 match evt {
                     nwg::Event::OnWindowClose => {
+                        let ui = ui.borrow();
                         if &handle == &ui.main_window {
                             MainApp::on_close(&ui);
                         }
                     }
                     nwg::Event::OnMenuItemSelected => {
+                        let ui = ui.borrow();
                         if &handle == &ui.menu.file_exit {
                             MainApp::on_close(&ui);
                         } else if &handle == &ui.menu.help_about {
@@ -42,8 +45,11 @@ impl nwg::NativeUi<MainAppUi> for MainApp {
                         }
                     }
                     nwg::Event::OnButtonClick => {
+                        let mut ui = ui.borrow_mut();
                         if &handle == &ui.scan_button {
                             MainApp::on_scan(&ui);
+                        } else if &handle == &ui.hook_button {
+                            MainApp::on_hook(&mut ui);
                         }
                     }
                     _ => {}
@@ -52,7 +58,7 @@ impl nwg::NativeUi<MainAppUi> for MainApp {
         };
 
         *ui.default_handler.borrow_mut() = Some(nwg::full_bind_event_handler(
-            &ui.inner.main_window.handle,
+            &ui.inner.borrow().main_window.handle,
             handle_events,
         ));
 

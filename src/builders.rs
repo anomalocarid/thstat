@@ -7,7 +7,7 @@ pub fn build_main_window(window: &mut MainApp) -> Result<(), nwg::NwgError> {
             nwg::WindowFlags::WINDOW | nwg::WindowFlags::VISIBLE | nwg::WindowFlags::MINIMIZE_BOX,
         )
         .title("thstat")
-        .size((300, 300))
+        .size((400, 600))
         .build(&mut window.main_window)?;
     nwg::Button::builder()
         .parent(&window.main_window)
@@ -18,15 +18,16 @@ pub fn build_main_window(window: &mut MainApp) -> Result<(), nwg::NwgError> {
         .text("Hook Selected")
         .build(&mut window.hook_button)?;
     nwg::ListBox::builder()
+        .flags(nwg::ListBoxFlags::VISIBLE | nwg::ListBoxFlags::TAB_STOP)
         .parent(&window.main_window)
         .build(&mut window.process_list)?;
     nwg::GridLayout::builder()
         .parent(&window.main_window)
         .max_column(Some(2))
-        .max_row(Some(4))
+        .max_row(Some(5))
         .child(0, 0, &window.scan_button)
         .child(1, 0, &window.hook_button)
-        .child_item(nwg::GridLayoutItem::new(&window.process_list, 0, 1, 2, 3))
+        .child_item(nwg::GridLayoutItem::new(&window.process_list, 0, 1, 2, 4))
         .build(&mut window.layout)
 }
 

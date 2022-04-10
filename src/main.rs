@@ -13,6 +13,7 @@ mod process;
 
 fn main() -> windows::core::Result<()> {
     nwg::init().expect("Failed to initialize.");
+    nwg::Font::set_global_family("Segoe UI").expect("Failed to set font.");
 
     let app = MainApp::build_ui(Default::default());
     match app {
