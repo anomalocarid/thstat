@@ -5,7 +5,7 @@ use std::rc::Rc;
 use windows::{
     core::Error,
     Win32::{
-        Foundation::{CloseHandle, BOOL, HANDLE},
+        Foundation::{CloseHandle, BOOL, HANDLE, STILL_ACTIVE},
         System::{
             Diagnostics::{
                 Debug::ReadProcessMemory,
@@ -14,7 +14,9 @@ use windows::{
                     TH32CS_SNAPPROCESS,
                 },
             },
-            Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ},
+            Threading::{
+                GetExitCodeProcess, OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ,
+            },
         },
     },
 };
@@ -24,6 +26,15 @@ use windows::{
 pub struct ProcessHandle(pub HANDLE);
 
 impl ProcessHandle {
+    pub fn is_active(&self) -> bool {
+        let mut exit_code: u32 = 0;
+        let b = unsafe { GetExitCodeProcess(self.0, &mut exit_code as *mut u32) };
+        if b.as_bool() {
+            return exit_code as i32 == STILL_ACTIVE.0;
+        }
+        false
+    }
+
     pub fn read_u32(&self, addr: *const c_void) -> Option<u32> {
         let mut dword: u32 = 0;
         let mut amt_read: usize = 0;

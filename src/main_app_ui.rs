@@ -17,6 +17,8 @@ impl nwg::NativeUi<MainAppUi> for MainApp {
         builders::build_process_window(&data.main_window, &mut data.process_window)?;
         // Main menu
         builders::build_menu(&mut data)?;
+        // Initialize
+        data.clear_game_info();
 
         // Make UI struct
         let ui = MainAppUi {

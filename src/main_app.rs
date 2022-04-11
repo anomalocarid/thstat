@@ -51,9 +51,24 @@ impl MainApp {
         nwg::stop_thread_dispatch();
     }
 
+    pub fn clear_game_info(&mut self) {
+        self.game = None;
+        self.status_label.set_text("Scanning for game...");
+        self.hiscore_value.set_text("");
+        self.score_value.set_text("");
+        self.power_value.set_text("");
+        self.lives_value.set_text("");
+        self.bombs_value.set_text("");
+    }
+
     pub fn on_game_update(&mut self) {
         match &self.game {
             Some(game) => {
+                // If process has exited, clear the game information out
+                if !self.process.handle.is_active() {
+                    self.clear_game_info();
+                    return;
+                }
                 // Update game information
                 if let Some(hiscore) = game.get_hiscore() {
                     self.hiscore_value.set_text(&format!("{}", hiscore))
