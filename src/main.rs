@@ -17,7 +17,8 @@ fn main() -> windows::core::Result<()> {
 
     let app = MainApp::build_ui(Default::default());
     match app {
-        Ok(_ui) => {
+        Ok(ui) => {
+            ui.inner.borrow().update_timer.start();
             nwg::dispatch_thread_events();
         }
         Err(e) => {

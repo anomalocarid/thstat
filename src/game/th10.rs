@@ -49,4 +49,8 @@ impl ThGame for Th10Game {
             .handle
             .read_u32(CURRENT_LIVES_ADDR as *const c_void)
     }
+
+    fn get_bombs(&self) -> Option<u32> {
+        None
+    }
 }
