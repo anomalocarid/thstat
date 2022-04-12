@@ -36,6 +36,8 @@ pub struct MainApp {
     pub lives_value: nwg::Label,
     pub bombs_label: nwg::Label,
     pub bombs_value: nwg::Label,
+    pub graze_label: nwg::Label,
+    pub graze_value: nwg::Label,
     pub layout: nwg::GridLayout,
     pub menu: MainAppMenu,
     pub process_window: ProcessWindow,
@@ -58,9 +60,10 @@ impl MainApp {
         self.power_value.set_text("");
         self.lives_value.set_text("");
         self.bombs_value.set_text("");
+        self.graze_value.set_text("");
     }
 
-    pub fn init_game(&mut self, name: &str) -> bool {
+    fn init_game(&mut self, name: &str) -> bool {
         match name {
             "th10.exe" => {
                 self.game = Some(Box::new(Th10Game::new(self.process.handle.clone())));
@@ -106,6 +109,9 @@ impl MainApp {
                 }
                 if let Some(bombs) = game.get_bombs() {
                     self.bombs_value.set_text(&format!("{}", bombs));
+                }
+                if let Some(graze) = game.get_graze() {
+                    self.graze_value.set_text(&format!("{}", graze));
                 }
             }
             // Scan for running game and  hook the first found

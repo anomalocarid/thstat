@@ -27,6 +27,7 @@ pub trait ThGame {
     fn get_power(&self) -> Option<f32>;
     fn get_lives(&self) -> Option<u32>;
     fn get_bombs(&self) -> Option<u32>;
+    fn get_graze(&self) -> Option<u32>;
 }
 
 pub struct GameBase {

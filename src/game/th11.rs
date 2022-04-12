@@ -1,10 +1,11 @@
 // Structures and definitions for Touhou 11
 use core::ffi::c_void;
 
-//const HISCORE_ADDR: u32 = 0;
+const HISCORE_ADDR: u32 = 0x4a56e0;
 const CURRENT_SCORE_ADDR: u32 = 0x4a56e4;
 const CURRENT_POWER_ADDR: u32 = 0x4a56e8;
 const CURRENT_LIVES_ADDR: u32 = 0x4a5718;
+const CURRENT_GRAZE_ADDR: u32 = 0x4A5754;
 
 use super::{GameBase, ThGame};
 use crate::process::ProcessHandle;
@@ -23,9 +24,9 @@ impl Th11Game {
 }
 
 impl ThGame for Th11Game {
-    // TODO: figure out address for high score
     fn get_hiscore(&self) -> Option<u64> {
-        None
+        let hiscore = self.base.handle.read_u32(HISCORE_ADDR as *const c_void);
+        hiscore.map(|x| (x as u64) * 10)
     }
 
     fn get_score(&self) -> Option<u64> {
@@ -51,6 +52,12 @@ impl ThGame for Th11Game {
     }
 
     fn get_bombs(&self) -> Option<u32> {
-        None
+        None // bombs are tied to power
+    }
+
+    fn get_graze(&self) -> Option<u32> {
+        self.base
+            .handle
+            .read_u32(CURRENT_GRAZE_ADDR as *const c_void)
     }
 }

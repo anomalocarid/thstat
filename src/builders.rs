@@ -72,10 +72,20 @@ pub fn build_main_window(window: &mut MainApp) -> Result<(), nwg::NwgError> {
         .text("0")
         .h_align(nwg::HTextAlign::Right)
         .build(&mut window.bombs_value)?;
+    nwg::Label::builder()
+        .parent(&window.main_window)
+        .text("Graze: ")
+        .h_align(nwg::HTextAlign::Right)
+        .build(&mut window.graze_label)?;
+    nwg::Label::builder()
+        .parent(&window.main_window)
+        .text("0")
+        .h_align(nwg::HTextAlign::Right)
+        .build(&mut window.graze_value)?;
     nwg::GridLayout::builder()
         .parent(&window.main_window)
         .max_column(Some(2))
-        .max_row(Some(6))
+        .max_row(Some(7))
         .child_item(nwg::GridLayoutItem::new(&window.status_label, 0, 0, 2, 1))
         .child(0, 1, &window.hiscore_label)
         .child(1, 1, &window.hiscore_value)
@@ -87,6 +97,8 @@ pub fn build_main_window(window: &mut MainApp) -> Result<(), nwg::NwgError> {
         .child(1, 4, &window.lives_value)
         .child(0, 5, &window.bombs_label)
         .child(1, 5, &window.bombs_value)
+        .child(0, 6, &window.graze_label)
+        .child(1, 6, &window.graze_value)
         .build(&mut window.layout)
 }
 

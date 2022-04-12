@@ -51,6 +51,10 @@ impl ThGame for Th10Game {
     }
 
     fn get_bombs(&self) -> Option<u32> {
-        None
+        None // bombs are tied to power
+    }
+
+    fn get_graze(&self) -> Option<u32> {
+        None // no graze counter
     }
 }

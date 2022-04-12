@@ -6,6 +6,7 @@ const CURRENT_SCORE_ADDR: u32 = 0x4b0c44;
 const CURRENT_POWER_ADDR: u32 = 0x4b0c48;
 const CURRENT_LIVES_ADDR: u32 = 0x4B0C98;
 const CURRENT_BOMBS_ADDR: u32 = 0x4B0CA0;
+const CURRENT_GRAZE_ADDR: u32 = 0x4B0CDC;
 
 use super::{GameBase, ThGame};
 use crate::process::ProcessHandle;
@@ -55,5 +56,11 @@ impl ThGame for Th12Game {
         self.base
             .handle
             .read_u32(CURRENT_BOMBS_ADDR as *const c_void)
+    }
+
+    fn get_graze(&self) -> Option<u32> {
+        self.base
+            .handle
+            .read_u32(CURRENT_GRAZE_ADDR as *const c_void)
     }
 }
