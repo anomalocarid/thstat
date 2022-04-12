@@ -1,4 +1,4 @@
-use crate::game::{th10::Th10Game, th11::Th11Game, th12::Th12Game, ThGame, PROCESS_NAMES};
+use crate::game::*;
 use crate::process::{get_process_list, open_process, Process, ProcessInfo};
 
 #[derive(Default)]
@@ -78,6 +78,15 @@ impl MainApp {
                 self.game = Some(Box::new(Th12Game::new(self.process.handle.clone())));
                 self.status_label
                     .set_text("Touhou 12 - Undefined Fantastic Object");
+            }
+            "th13.exe" => {
+                self.game = Some(Box::new(Th13Game::new(self.process.handle.clone())));
+                self.status_label.set_text("Touhou 13 - Ten Desires");
+            }
+            "th15.exe" => {
+                self.game = Some(Box::new(Th15Game::new(self.process.handle.clone())));
+                self.status_label
+                    .set_text("Touhou 15 - Legacy of Lunatic Kingdom");
             }
             _ => {
                 return false;
