@@ -1,5 +1,4 @@
-use crate::game::th10::Th10Game;
-use crate::game::{ThGame, PROCESS_NAMES};
+use crate::game::{th10::Th10Game, th11::Th11Game, th12::Th12Game, ThGame, PROCESS_NAMES};
 use crate::process::{get_process_list, open_process, Process, ProcessInfo};
 
 #[derive(Default)]
@@ -61,6 +60,29 @@ impl MainApp {
         self.bombs_value.set_text("");
     }
 
+    pub fn init_game(&mut self, name: &str) -> bool {
+        match name {
+            "th10.exe" => {
+                self.game = Some(Box::new(Th10Game::new(self.process.handle.clone())));
+                self.status_label.set_text("Touhou 10 - Mountain of Faith");
+            }
+            "th11.exe" => {
+                self.game = Some(Box::new(Th11Game::new(self.process.handle.clone())));
+                self.status_label
+                    .set_text("Touhou 11 - Subterranean Animism");
+            }
+            "th12.exe" => {
+                self.game = Some(Box::new(Th12Game::new(self.process.handle.clone())));
+                self.status_label
+                    .set_text("Touhou 12 - Undefined Fantastic Object");
+            }
+            _ => {
+                return false;
+            }
+        }
+        true
+    }
+
     pub fn on_game_update(&mut self) {
         match &self.game {
             Some(game) => {
@@ -99,42 +121,24 @@ impl MainApp {
                             .filter(|p| PROCESS_NAMES.iter().any(|&s| s == p.name))
                             .collect();
                         if let Some(p) = list.pop() {
-                            let mut matched = true;
                             // Build GameInfo object based on game name
-                            match p.name.as_str() {
-                                "th10.exe" => {
-                                    let result = open_process(&p);
-                                    match result {
-                                        Ok(process) => {
-                                            self.process = process;
-                                            self.game = Some(Box::new(Th10Game::new(
-                                                self.process.handle.clone(),
-                                            )));
-                                            self.status_label
-                                                .set_text("Touhou 10 - Mountain of Faith");
-                                        }
-                                        Err(e) => {
-                                            let s = format!("{}", e);
-                                            nwg::modal_error_message(
-                                                &self.main_window,
-                                                "Error",
-                                                &s,
-                                            );
-                                        }
+                            let result = open_process(&p);
+                            match result {
+                                Ok(process) => {
+                                    self.process = process;
+                                    if self.init_game(p.name.as_str()) {
+                                        self.process_window
+                                            .id_value
+                                            .set_text(&format!("{}", self.process.info.pid));
+                                        self.process_window
+                                            .name_value
+                                            .set_text(&format!("{}", &self.process.info.name));
                                     }
                                 }
-                                _ => {
-                                    matched = false;
+                                Err(e) => {
+                                    let s = format!("{}", e);
+                                    nwg::modal_error_message(&self.main_window, "Error", &s);
                                 }
-                            }
-
-                            if matched {
-                                self.process_window
-                                    .id_value
-                                    .set_text(&format!("{}", self.process.info.pid));
-                                self.process_window
-                                    .name_value
-                                    .set_text(&format!("{}", &self.process.info.name));
                             }
                         }
                     }

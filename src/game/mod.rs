@@ -2,6 +2,8 @@
 use crate::process::ProcessHandle;
 use std::rc::Rc;
 pub mod th10;
+pub mod th11;
+pub mod th12;
 
 pub static PROCESS_NAMES: [&str; 13] = [
     "東方紅魔郷.exe",
