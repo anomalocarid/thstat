@@ -14,7 +14,7 @@ Display the following information in a separate window while playing the game:
 
 # Supported Games
 
-* Touhou 10, 11, 12, 13, and 15 are currently supported.
+* Touhou 06, 10, 11, 12, 13, 15, 16, and 17 are currently supported.
 
 # Acknowledgments
 
