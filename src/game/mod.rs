@@ -7,8 +7,11 @@ pub mod th12;
 pub mod th13;
 pub mod th14;
 pub mod th15;
+pub mod th16;
+pub mod th17;
 pub use self::{
     th10::Th10Game, th11::Th11Game, th12::Th12Game, th13::Th13Game, th14::Th14Game, th15::Th15Game,
+    th16::Th16Game, th17::Th17Game,
 };
 
 pub static PROCESS_NAMES: [&str; 13] = [

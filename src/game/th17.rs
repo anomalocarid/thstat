@@ -1,30 +1,32 @@
-// Structures and definitions for Touhou 13
+// Structures and definitions for Touhou 17
 use core::ffi::c_void;
 
-const HISCORE_ADDR: u32 = 0x4be810;
-const CURRENT_SCORE_ADDR: u32 = 0x4be7c0;
-const CURRENT_POWER_ADDR: u32 = 0x4be7e8;
-const CURRENT_LIVES_ADDR: u32 = 0x4be7f4;
-const CURRENT_BOMBS_ADDR: u32 = 0x4be800;
-const CURRENT_GRAZE_ADDR: u32 = 0x4be7d0;
+const GLOBALS_BASE_ADDR: u32 = 0x4b59c0;
+const HISCORE_ADDR: u32 = GLOBALS_BASE_ADDR + 0x00;
+const GLOBALS_INNER_OFFSET: u32 = 0x1C;
+const CURRENT_SCORE_ADDR: u32 = GLOBALS_BASE_ADDR + GLOBALS_INNER_OFFSET + 0x20;
+const CURRENT_POWER_ADDR: u32 = GLOBALS_BASE_ADDR + GLOBALS_INNER_OFFSET + 0x54;
+const CURRENT_LIVES_ADDR: u32 = GLOBALS_BASE_ADDR + GLOBALS_INNER_OFFSET + 0x64;
+const CURRENT_BOMBS_ADDR: u32 = GLOBALS_BASE_ADDR + GLOBALS_INNER_OFFSET + 0x70;
+const CURRENT_GRAZE_ADDR: u32 = GLOBALS_BASE_ADDR + GLOBALS_INNER_OFFSET + 0x30;
 
 use super::{GameBase, ThGame};
 use crate::process::ProcessHandle;
 use std::rc::Rc;
 
-pub struct Th13Game {
+pub struct Th17Game {
     base: GameBase,
 }
 
-impl Th13Game {
+impl Th17Game {
     pub fn new(handle: Rc<ProcessHandle>) -> Self {
-        Th13Game {
+        Th17Game {
             base: GameBase { handle: handle },
         }
     }
 }
 
-impl ThGame for Th13Game {
+impl ThGame for Th17Game {
     fn get_hiscore(&self) -> Option<u64> {
         let hiscore = self.base.handle.read_u32(HISCORE_ADDR as *const c_void);
         hiscore.map(|x| (x as u64) * 10)

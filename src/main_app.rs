@@ -88,6 +88,16 @@ impl MainApp {
                 self.status_label
                     .set_text("Touhou 15 - Legacy of Lunatic Kingdom");
             }
+            "th16.exe" => {
+                self.game = Some(Box::new(Th16Game::new(self.process.handle.clone())));
+                self.status_label
+                    .set_text("Touhou 16 - Hidden Star in Four Seasons");
+            }
+            "th17.exe" => {
+                self.game = Some(Box::new(Th17Game::new(self.process.handle.clone())));
+                self.status_label
+                    .set_text("Touhou 17 - Wily Beast and Weakest Creature");
+            }
             _ => {
                 return false;
             }

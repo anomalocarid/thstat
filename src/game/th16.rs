@@ -1,30 +1,30 @@
-// Structures and definitions for Touhou 13
+// Structures and definitions for Touhou 16
 use core::ffi::c_void;
 
-const HISCORE_ADDR: u32 = 0x4be810;
-const CURRENT_SCORE_ADDR: u32 = 0x4be7c0;
-const CURRENT_POWER_ADDR: u32 = 0x4be7e8;
-const CURRENT_LIVES_ADDR: u32 = 0x4be7f4;
-const CURRENT_BOMBS_ADDR: u32 = 0x4be800;
-const CURRENT_GRAZE_ADDR: u32 = 0x4be7d0;
+const HISCORE_ADDR: u32 = 0;
+const CURRENT_SCORE_ADDR: u32 = 0x4a57b0;
+const CURRENT_POWER_ADDR: u32 = 0x4a57e4;
+const CURRENT_LIVES_ADDR: u32 = 0x4a57f4;
+const CURRENT_BOMBS_ADDR: u32 = 0x4a5800;
+const CURRENT_GRAZE_ADDR: u32 = 0x4a57c0;
 
 use super::{GameBase, ThGame};
 use crate::process::ProcessHandle;
 use std::rc::Rc;
 
-pub struct Th13Game {
+pub struct Th16Game {
     base: GameBase,
 }
 
-impl Th13Game {
+impl Th16Game {
     pub fn new(handle: Rc<ProcessHandle>) -> Self {
-        Th13Game {
+        Th16Game {
             base: GameBase { handle: handle },
         }
     }
 }
 
-impl ThGame for Th13Game {
+impl ThGame for Th16Game {
     fn get_hiscore(&self) -> Option<u64> {
         let hiscore = self.base.handle.read_u32(HISCORE_ADDR as *const c_void);
         hiscore.map(|x| (x as u64) * 10)
