@@ -55,14 +55,14 @@ impl ProcessHandle {
         Some(dword)
     }
 
-    pub fn read_u16(&self, addr: *const c_void) -> Option<u32> {
-        let mut word: u32 = 0;
+    pub fn read_u16(&self, addr: *const c_void) -> Option<u16> {
+        let mut word: u16 = 0;
         let mut amt_read: usize = 0;
         let b = unsafe {
             ReadProcessMemory(
                 self.0,
                 addr,
-                &mut word as *mut u32 as *mut c_void,
+                &mut word as *mut u16 as *mut c_void,
                 2,
                 &mut amt_read,
             )
@@ -73,6 +73,26 @@ impl ProcessHandle {
         }
 
         Some(word)
+    }
+
+    pub fn read_u8(&self, addr: *const c_void) -> Option<u8> {
+        let mut byte: u8 = 0;
+        let mut amt_read: usize = 0;
+        let b = unsafe {
+            ReadProcessMemory(
+                self.0,
+                addr,
+                &mut byte as *mut u8 as *mut c_void,
+                1,
+                &mut amt_read,
+            )
+        };
+
+        if !b.as_bool() || amt_read != 1 {
+            return None;
+        }
+
+        Some(byte)
     }
 }
 

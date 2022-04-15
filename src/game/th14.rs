@@ -26,6 +26,7 @@ impl Th14Game {
 }
 
 impl ThGame for Th14Game {
+    fn update(&mut self) {}
     fn get_hiscore(&self) -> Option<u64> {
         let hiscore = self.base.handle.read_u32(HISCORE_ADDR as *const c_void);
         hiscore.map(|x| (x as u64) * 10)

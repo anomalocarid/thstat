@@ -1,30 +1,31 @@
-// Structures and definitions for Touhou 15
+// Structures and definitions for Touhou 06
 use core::ffi::c_void;
 
-const HISCORE_ADDR: u32 = 0x4e75bc;
-const CURRENT_SCORE_ADDR: u32 = 0x4e740c;
-const CURRENT_POWER_ADDR: u32 = 0x4e7440;
-const CURRENT_LIVES_ADDR: u32 = 0x4e7450;
-const CURRENT_BOMBS_ADDR: u32 = 0x4e745c;
-const CURRENT_GRAZE_ADDR: u32 = 0x4e741c;
+const GAME_MANAGER_ADDR: u32 = 0x69bca0;
+const HISCORE_ADDR: u32 = GAME_MANAGER_ADDR + 0x0c;
+const CURRENT_SCORE_ADDR: u32 = GAME_MANAGER_ADDR + 0x04;
+const CURRENT_POWER_ADDR: u32 = GAME_MANAGER_ADDR + 0x1810;
+const CURRENT_LIVES_ADDR: u32 = GAME_MANAGER_ADDR + 0x181a;
+const CURRENT_BOMBS_ADDR: u32 = GAME_MANAGER_ADDR + 0x181b;
+const CURRENT_GRAZE_ADDR: u32 = GAME_MANAGER_ADDR + 0x14;
 
 use super::{GameBase, ThGame};
 use crate::process::ProcessHandle;
 use std::rc::Rc;
 
-pub struct Th15Game {
+pub struct Th06Game {
     base: GameBase,
 }
 
-impl Th15Game {
+impl Th06Game {
     pub fn new(handle: Rc<ProcessHandle>) -> Self {
-        Th15Game {
+        Th06Game {
             base: GameBase { handle: handle },
         }
     }
 }
 
-impl ThGame for Th15Game {
+impl ThGame for Th06Game {
     fn update(&mut self) {}
     fn get_hiscore(&self) -> Option<u64> {
         let hiscore = self.base.handle.read_u32(HISCORE_ADDR as *const c_void);
@@ -44,19 +45,23 @@ impl ThGame for Th15Game {
             .base
             .handle
             .read_u16(CURRENT_POWER_ADDR as *const c_void);
-        power.map(|x| (x as f32) / 100.0)
+        power.map(|x| x as f32)
     }
 
     fn get_lives(&self) -> Option<u32> {
-        self.base
+        let lives = self
+            .base
             .handle
-            .read_u32(CURRENT_LIVES_ADDR as *const c_void)
+            .read_u8(CURRENT_LIVES_ADDR as *const c_void);
+        lives.map(|x| x as u32)
     }
 
     fn get_bombs(&self) -> Option<u32> {
-        self.base
+        let bombs = self
+            .base
             .handle
-            .read_u32(CURRENT_BOMBS_ADDR as *const c_void)
+            .read_u8(CURRENT_BOMBS_ADDR as *const c_void);
+        bombs.map(|x| x as u32)
     }
 
     fn get_graze(&self) -> Option<u32> {

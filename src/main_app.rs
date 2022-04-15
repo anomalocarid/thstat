@@ -65,6 +65,11 @@ impl MainApp {
 
     fn init_game(&mut self, name: &str) -> bool {
         match name {
+            "東方紅魔郷.exe" => {
+                self.game = Some(Box::new(Th06Game::new(self.process.handle.clone())));
+                self.status_label
+                    .set_text("Touhou 06 - Embodiment of Scarlet Devil");
+            }
             "th10.exe" => {
                 self.game = Some(Box::new(Th10Game::new(self.process.handle.clone())));
                 self.status_label.set_text("Touhou 10 - Mountain of Faith");
@@ -106,13 +111,14 @@ impl MainApp {
     }
 
     pub fn on_game_update(&mut self) {
-        match &self.game {
+        match &mut self.game {
             Some(game) => {
                 // If process has exited, clear the game information out
                 if !self.process.handle.is_active() {
                     self.clear_game_info();
                     return;
                 }
+                game.update();
                 // Update game information
                 if let Some(hiscore) = game.get_hiscore() {
                     self.hiscore_value.set_text(&format!("{}", hiscore))
