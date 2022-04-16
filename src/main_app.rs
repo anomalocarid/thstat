@@ -70,6 +70,10 @@ impl MainApp {
                 self.status_label
                     .set_text("Touhou 06 - Embodiment of Scarlet Devil");
             }
+            "th08.exe" => {
+                self.game = Some(Box::new(Th08Game::new(self.process.handle.clone())));
+                self.status_label.set_text("Touhou 08 - Imperishable Night");
+            }
             "th10.exe" => {
                 self.game = Some(Box::new(Th10Game::new(self.process.handle.clone())));
                 self.status_label.set_text("Touhou 10 - Mountain of Faith");

@@ -94,6 +94,26 @@ impl ProcessHandle {
 
         Some(byte)
     }
+
+    pub fn read_float(&self, addr: *const c_void) -> Option<f32> {
+        let mut float: f32 = 0.0;
+        let mut amt_read: usize = 0;
+        let b = unsafe {
+            ReadProcessMemory(
+                self.0,
+                addr,
+                &mut float as *mut f32 as *mut c_void,
+                4,
+                &mut amt_read,
+            )
+        };
+
+        if !b.as_bool() || amt_read != 4 {
+            return None;
+        }
+
+        Some(float)
+    }
 }
 
 impl Drop for ProcessHandle {
