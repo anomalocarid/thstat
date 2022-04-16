@@ -42,6 +42,13 @@ pub trait ThGame {
     fn get_graze(&self) -> Option<u32>;
 }
 
+#[derive(Default)]
 pub struct GameBase {
     handle: Rc<ProcessHandle>,
+    hiscore: Option<u64>,
+    score: Option<u64>,
+    lives: Option<u32>,
+    bombs: Option<u32>,
+    power: Option<f32>,
+    graze: Option<u32>,
 }

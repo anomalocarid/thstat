@@ -18,9 +18,9 @@ pub struct Th16Game {
 
 impl Th16Game {
     pub fn new(handle: Rc<ProcessHandle>) -> Self {
-        Th16Game {
-            base: GameBase { handle: handle },
-        }
+        let mut base: GameBase = Default::default();
+        base.handle = handle;
+        Th16Game { base: base }
     }
 }
 

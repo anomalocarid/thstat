@@ -17,25 +17,15 @@ use std::rc::Rc;
 pub struct Th08Game {
     base: GameBase,
     globals: Option<u32>,
-    score: Option<u64>,
-    hiscore: Option<u64>,
-    lives: Option<u32>,
-    bombs: Option<u32>,
-    power: Option<f32>,
-    graze: Option<u32>,
 }
 
 impl Th08Game {
     pub fn new(handle: Rc<ProcessHandle>) -> Self {
+        let mut base: GameBase = Default::default();
+        base.handle = handle;
         Th08Game {
-            base: GameBase { handle: handle },
+            base: base,
             globals: None,
-            score: None,
-            hiscore: None,
-            lives: None,
-            bombs: None,
-            power: None,
-            graze: None,
         }
     }
 }
@@ -47,31 +37,31 @@ impl ThGame for Th08Game {
         // we're actually in game
         self.globals = self.base.handle.read_u32(GLOBALS_ADDR as *const c_void);
         if let Some(globals) = self.globals {
-            self.score = self
+            self.base.score = self
                 .base
                 .handle
                 .read_u32((globals + CURRENT_SCORE_OFFSET) as *const c_void)
                 .map(|x| (x as u64) * 10);
-            self.hiscore = self
+            self.base.hiscore = self
                 .base
                 .handle
                 .read_u32((globals + HISCORE_OFFSET) as *const c_void)
                 .map(|x| (x as u64) * 10);
-            self.lives = self
+            self.base.lives = self
                 .base
                 .handle
                 .read_float((globals + CURRENT_LIVES_OFFSET) as *const c_void)
                 .map(|x| (x as u32));
-            self.bombs = self
+            self.base.bombs = self
                 .base
                 .handle
                 .read_float((globals + CURRENT_BOMBS_OFFSET) as *const c_void)
                 .map(|x| (x as u32));
-            self.power = self
+            self.base.power = self
                 .base
                 .handle
                 .read_float((globals + CURRENT_POWER_OFFSET) as *const c_void);
-            self.graze = self
+            self.base.graze = self
                 .base
                 .handle
                 .read_u32((globals + CURRENT_GRAZE_OFFSET) as *const c_void);
@@ -79,26 +69,26 @@ impl ThGame for Th08Game {
     }
 
     fn get_hiscore(&self) -> Option<u64> {
-        self.hiscore
+        self.base.hiscore
     }
 
     fn get_score(&self) -> Option<u64> {
-        self.score
+        self.base.score
     }
 
     fn get_power(&self) -> Option<f32> {
-        self.power
+        self.base.power
     }
 
     fn get_lives(&self) -> Option<u32> {
-        self.lives
+        self.base.lives
     }
 
     fn get_bombs(&self) -> Option<u32> {
-        self.bombs
+        self.base.bombs
     }
 
     fn get_graze(&self) -> Option<u32> {
-        self.graze
+        self.base.graze
     }
 }
