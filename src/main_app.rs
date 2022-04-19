@@ -6,6 +6,7 @@ pub struct MainAppMenu {
     pub file: nwg::Menu,
     pub file_exit: nwg::MenuItem,
     pub view: nwg::Menu,
+    pub view_timing: nwg::MenuItem,
     pub view_process: nwg::MenuItem,
     pub help: nwg::Menu,
     pub help_about: nwg::MenuItem,
@@ -19,6 +20,14 @@ pub struct ProcessWindow {
     pub name_value: nwg::Label,
     pub id_label: nwg::Label,
     pub id_value: nwg::Label,
+}
+
+#[derive(Default)]
+pub struct TimingWindow {
+    pub handle: nwg::Window,
+    pub layout: nwg::GridLayout,
+    pub speed_label: nwg::Label,
+    pub speed_value: nwg::Label,
 }
 
 #[derive(Default)]
@@ -41,6 +50,7 @@ pub struct MainApp {
     pub layout: nwg::GridLayout,
     pub menu: MainAppMenu,
     pub process_window: ProcessWindow,
+    pub timing_window: TimingWindow,
     pub process: Process,
     pub game: Option<Box<dyn ThGame>>,
 }
@@ -61,6 +71,7 @@ impl MainApp {
         self.lives_value.set_text("");
         self.bombs_value.set_text("");
         self.graze_value.set_text("");
+        self.timing_window.speed_value.set_text("");
     }
 
     fn init_game(&mut self, name: &str) -> bool {
@@ -142,6 +153,13 @@ impl MainApp {
                 if let Some(graze) = game.get_graze() {
                     self.graze_value.set_text(&format!("{}", graze));
                 }
+                if self.timing_window.handle.visible() {
+                    if let Some(game_speed) = game.get_game_speed() {
+                        self.timing_window
+                            .speed_value
+                            .set_text(&format!("{}", game_speed));
+                    }
+                }
             }
             // Scan for running game and  hook the first found
             None => {
@@ -186,9 +204,18 @@ impl MainApp {
         }
     }
 
+    pub fn toggle_window(&self, window: &nwg::Window, menu_item: &nwg::MenuItem) {
+        let visibility = !window.visible();
+        menu_item.set_checked(visibility);
+        window.set_visible(visibility);
+    }
+
+    pub fn on_view_timing(&self) {
+        self.toggle_window(&self.timing_window.handle, &self.menu.view_timing);
+    }
+
     pub fn on_view_process(&self) {
-        let is_visible = self.process_window.handle.visible();
-        self.process_window.handle.set_visible(!is_visible);
+        self.toggle_window(&self.process_window.handle, &self.menu.view_process);
     }
 
     pub fn on_help_about(&self) {

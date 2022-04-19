@@ -40,6 +40,9 @@ pub trait ThGame {
     fn get_lives(&self) -> Option<u32>;
     fn get_bombs(&self) -> Option<u32>;
     fn get_graze(&self) -> Option<u32>;
+    fn get_game_speed(&self) -> Option<u32> {
+        None
+    }
 }
 
 #[derive(Default)]
@@ -51,4 +54,17 @@ pub struct GameBase {
     bombs: Option<u32>,
     power: Option<f32>,
     graze: Option<u32>,
+    game_speed: Option<u32>,
+}
+
+impl GameBase {
+    // Clear out values
+    pub fn clear(&mut self) {
+        self.hiscore = None;
+        self.score = None;
+        self.lives = None;
+        self.bombs = None;
+        self.power = None;
+        self.graze = None;
+    }
 }

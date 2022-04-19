@@ -15,6 +15,7 @@ impl nwg::NativeUi<MainAppUi> for MainApp {
         // Windows
         builders::build_main_window(&mut data)?;
         builders::build_process_window(&data.main_window, &mut data.process_window)?;
+        builders::build_timing_window(&data.main_window, &mut data.timing_window)?;
         // Main menu
         builders::build_menu(&mut data)?;
         // Initialize
@@ -40,10 +41,12 @@ impl nwg::NativeUi<MainAppUi> for MainApp {
                         let mut ui = ui.borrow_mut();
                         if &handle == &ui.menu.file_exit {
                             MainApp::on_close(&mut ui);
-                        } else if &handle == &ui.menu.help_about {
-                            MainApp::on_help_about(&ui);
+                        } else if &handle == &ui.menu.view_timing {
+                            MainApp::on_view_timing(&ui);
                         } else if &handle == &ui.menu.view_process {
                             MainApp::on_view_process(&ui);
+                        } else if &handle == &ui.menu.help_about {
+                            MainApp::on_help_about(&ui);
                         }
                     }
                     nwg::Event::OnTimerTick => {

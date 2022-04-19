@@ -5,6 +5,7 @@ const HISCORE_ADDR: u32 = 0x474c40;
 const CURRENT_SCORE_ADDR: u32 = 0x474c44;
 const CURRENT_POWER_ADDR: u32 = 0x474c48;
 const CURRENT_LIVES_ADDR: u32 = 0x474C70;
+const GAME_SPEED_ADDR: u32 = 0x476f78;
 
 use super::{GameBase, ThGame};
 use crate::process::ProcessHandle;
@@ -43,6 +44,7 @@ impl ThGame for Th10Game {
             .base
             .handle
             .read_u32(CURRENT_LIVES_ADDR as *const c_void);
+        self.base.game_speed = self.base.handle.read_u32(GAME_SPEED_ADDR as *const c_void);
     }
     fn get_hiscore(&self) -> Option<u64> {
         self.base.hiscore
@@ -66,5 +68,9 @@ impl ThGame for Th10Game {
 
     fn get_graze(&self) -> Option<u32> {
         None // no graze counter
+    }
+
+    fn get_game_speed(&self) -> Option<u32> {
+        self.base.game_speed
     }
 }

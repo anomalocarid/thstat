@@ -18,6 +18,7 @@ pub struct Th14Game {
 }
 
 impl Th14Game {
+    #[allow(dead_code)]
     pub fn new(handle: Rc<ProcessHandle>) -> Self {
         let mut base: GameBase = Default::default();
         base.handle = handle;

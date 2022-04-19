@@ -1,5 +1,5 @@
 // All the boilerplate code to generate windows and controls goes in this file
-use crate::main_app::{MainApp, ProcessWindow};
+use crate::main_app::{MainApp, ProcessWindow, TimingWindow};
 use std::time::Duration;
 
 /// Build the main window
@@ -102,6 +102,35 @@ pub fn build_main_window(window: &mut MainApp) -> Result<(), nwg::NwgError> {
         .build(&mut window.layout)
 }
 
+pub fn build_timing_window(
+    parent: &nwg::Window,
+    window: &mut TimingWindow,
+) -> Result<(), nwg::NwgError> {
+    let (px, py) = parent.position();
+    let (pw, _ph) = parent.size();
+    nwg::Window::builder()
+        .parent(Some(parent))
+        .flags(nwg::WindowFlags::WINDOW)
+        .title("Timing Information")
+        .position((8 + px + pw as i32, py))
+        .size((500, 200))
+        .build(&mut window.handle)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
+        .text("Game Speed:")
+        .build(&mut window.speed_label)?;
+    nwg::Label::builder()
+        .parent(&window.handle)
+        .text("")
+        .build(&mut window.speed_value)?;
+    nwg::GridLayout::builder()
+        .parent(&window.handle)
+        .max_column(Some(2))
+        .child(0, 0, &window.speed_label)
+        .child(1, 0, &window.speed_value)
+        .build(&mut window.layout)
+}
+
 /// Build the process window
 pub fn build_process_window(
     parent: &nwg::Window,
@@ -161,6 +190,11 @@ pub fn build_menu(data: &mut MainApp) -> Result<(), nwg::NwgError> {
         .disabled(false)
         .parent(&data.main_window.handle)
         .build(&mut data.menu.view)?;
+    nwg::MenuItem::builder()
+        .text("Timing Window")
+        .disabled(false)
+        .parent(&data.menu.view)
+        .build(&mut data.menu.view_timing)?;
     nwg::MenuItem::builder()
         .text("Process window")
         .disabled(false)

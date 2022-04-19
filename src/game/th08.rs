@@ -48,6 +48,7 @@ impl Th08Game {
 impl ThGame for Th08Game {
     fn update(&mut self) {
         if !self.in_game() {
+            self.base.clear();
             self.globals = None; // Globals pointer not valid until in game
             return;
         }
